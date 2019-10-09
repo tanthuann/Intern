@@ -1,7 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
+import { Provider } from "react-redux";
 import { Layout } from "antd";
+
+import store from './store';
 
 //Components
 import TopMenu from "./Components/TopMenu";
@@ -14,7 +16,6 @@ import { routes } from "./routers/routers";
 
 //const {Title, Paragraph } = Typography;
 const { Header, Content } = Layout;
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -25,11 +26,13 @@ class App extends React.Component {
 
   render() {
     return (
-      <Layout>
-        <Router>
-          <Header>
-            <TopMenu />
-          </Header>
+      <Provider store={store}>
+        <Layout>
+          <Router>
+            <Header>
+              <TopMenu />
+            </Header>
+            <Switch>
             {routes.map((route, index) => (
               <Route
                 key={index}
@@ -38,8 +41,10 @@ class App extends React.Component {
                 component={route.component}
               ></Route>
             ))}
-        </Router>
-      </Layout>
+            </Switch>
+          </Router>
+        </Layout>
+      </Provider>
     );
   }
 }

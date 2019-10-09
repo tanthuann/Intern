@@ -1,17 +1,18 @@
 import React, { Component } from "react";
-import axios from 'axios';
-import { Row, Pagination } from "antd";
+import axios from "axios";
+import { connect } from "react-redux";
+import { getPhotoAlbum } from "../actions/getActions";
+
+import { Row, Pagination, Spin } from "antd";
 
 //Components
 import CardPhoto from "./CardPhoto.js";
 
-import { LIMIT_PHOTOS } from '../constants/constants';
-
-export default class Photos extends Component {
+class Photos extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: []
+      loading: true
     };
     this.onChange = this.onChange.bind(this);
   }
@@ -21,35 +22,23 @@ export default class Photos extends Component {
     let endPhoto = pageNumber * 9 || 9;
     let startPhoto = pageNumber * 9 - 9 || 0;
     console.log(startPhoto, endPhoto);
-    this.callAPI(startPhoto);
-    // this.setState({
-    //   // TODO:  1. Phan trang theo server
-    //   // TODO: 2.
-    //   data: this.props.data.slice(startPhoto, endPhoto)
-    // });
-  }
-
-  callAPI(startPhoto = 0) {
-    axios
-      .get(
-        `https://jsonplaceholder.typicode.com/photos?_start=${startPhoto}&_limit=${LIMIT_PHOTOS}`
-      )
-      .then(res => {
-        this.setState({
-          data: res.data
-        });
-      });
+    this.props.getPhotoAlbum(startPhoto);
   }
 
   componentDidMount() {
-    this.callAPI();
+    this.props.getPhotoAlbum();
+    setInterval( () => {
+      this.setState({
+        loading: false
+      })
+    }, 500)
   }
 
-
   render() {
-    let { data } = this.state;
+    let { data } = this.props;
+    const { loading } = this.state;
     return (
-      <>
+      <Spin tip="Loading..." spinning={loading} size="large">
         <Row
           style={{ margin: "10% 15%" }}
           gutter={12}
@@ -67,7 +56,16 @@ export default class Photos extends Component {
             onChange={this.onChange}
           />
         </Row>
-      </>
+      </Spin>
     );
   }
 }
+
+const mapStateToProps = state => ({
+  data: state.datas.album
+});
+
+export default connect(
+  mapStateToProps,
+  { getPhotoAlbum }
+)(Photos);

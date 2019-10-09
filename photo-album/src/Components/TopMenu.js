@@ -1,6 +1,6 @@
 import React from 'react';
 import { Menu } from 'antd';
-import { BrowserRouter as Router, Link } from "react-router-dom";
+import { BrowserRouter as  Link } from "react-router-dom";
 
 export default function(){
     return(

@@ -10,11 +10,11 @@ export const routes = [
   {
     path: "/",
     component: Home,
-    exact: true
+    exact: false
   },
   {
     path: "/users",
     component: Users,
-    exact: true
+    exact: false
   }
 ];

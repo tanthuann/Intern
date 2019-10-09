@@ -1,4 +1,7 @@
 import React from "react";
+import { connect } from 'react-redux';
+import { getUsers } from '../actions/getActions';
+import { deleteUser } from '../actions/deleteActions';
 
 import {
   Table,
@@ -21,11 +24,10 @@ import { LIMIT_USERS } from "../constants/constants";
 
 const { Title } = Typography;
 
-export default class Users extends React.Component {
+class Users extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [],
       searchText: ""
     };
 
@@ -33,9 +35,10 @@ export default class Users extends React.Component {
   }
 
   onChangePage(pageNumber) {
-    let startUser = LIMIT_USERS * (pageNumber - 1);
-    this.callAPI(startUser);
-    console.log("???", startUser);
+    //let startUser;
+    let startUser = LIMIT_USERS * (pageNumber.current - 1);
+    this.props.getUsers(startUser);
+    console.log("???", pageNumber);
   }
 
   getColumnSearchProps = dataIndex => ({
@@ -109,35 +112,20 @@ export default class Users extends React.Component {
     this.setState({ searchText: "" });
   };
 
-  handleDelete = key => {
-    const data = [...this.state.data];
-    this.setState({ data: data.filter(item => item.key !== key) });
-    axios.delete(`https://jsonplaceholder.typicode.com/users/${key + 1}`).then( () => {console.log("DELECTED")} );
+  handleDelete = id => {
+    const data = [...this.props.data];
+    console.log('ham handle :',data);
+    //this.setState({ data: data.filter(item => item.key !== key) });
+    this.props.deleteUser(id);
+    axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`).then( () => {console.log("DELECTED")} );
   };
 
-  callAPI(startUser = 0) {
-    axios
-      .get(
-        `https://jsonplaceholder.typicode.com/users?_start=${startUser}&_limit=${LIMIT_USERS}`
-      )
-      .then(res => {
-        this.setState({
-          data: [].concat(res.data).map((user, index) => {
-            return {
-              key: index,
-              ...user
-            };
-          })
-        });
-      });
-  }
-
   componentDidMount() {
-    this.callAPI();
+    this.props.getUsers();
   }
 
   render() {
-    const { data } = this.state;
+    const { data } = this.props;
     console.log(data);
     const columns = [
       {
@@ -175,10 +163,10 @@ export default class Users extends React.Component {
         title: "Action",
         dataIndex: "operation",
         render: (text, record) =>
-          this.state.data.length >= 1 ? (
+          this.props.data.length >= 1 ? (
             <Popconfirm
               title="Sure to delete?"
-              onConfirm={() => this.handleDelete(record.key)}
+              onConfirm={() => this.handleDelete(record.id)}
             >
               <Button type="danger" ghost>
                 Delete
@@ -195,7 +183,7 @@ export default class Users extends React.Component {
         <Table
           columns={columns}
           dataSource={data}
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 10 }}
           onChange={this.onChangePage}
         />
         {/* <Row type="flex" justify="space-around">
@@ -212,3 +200,11 @@ export default class Users extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  data: state.datas.users
+})
+
+export default connect(mapStateToProps, { getUsers, deleteUser })(Users)
+
+

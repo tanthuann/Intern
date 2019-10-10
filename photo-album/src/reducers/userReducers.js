@@ -7,18 +7,12 @@ const {
 } = CONSTANTS.ACTIONS;
 
 const initialState = {
-  album: [],
   users: [],
   user: {}
 };
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case AXIOS_GET_ALBUM:
-      return {
-        ...state,
-        album: action.payload
-      };
     case AXIOS_GET_USERS:
       return {
         ...state,

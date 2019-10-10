@@ -1,13 +1,10 @@
 import React from "react";
-import { connect } from 'react-redux';
-import { getUsers } from '../actions/getActions';
-import { deleteUser } from '../actions/deleteActions';
+import { connect } from "react-redux";
+import { deleteUser, getUsers } from "../actions/userActions";
 
 import {
   Table,
   Typography,
-  Pagination,
-  Row,
   Input,
   Button,
   Icon,
@@ -114,10 +111,9 @@ class Users extends React.Component {
 
   handleDelete = id => {
     const data = [...this.props.data];
-    console.log('ham handle :',data);
+    console.log("ham handle :", data);
     //this.setState({ data: data.filter(item => item.key !== key) });
     this.props.deleteUser(id);
-    axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`).then( () => {console.log("DELECTED")} );
   };
 
   componentDidMount() {
@@ -186,25 +182,24 @@ class Users extends React.Component {
           pagination={{ pageSize: 10 }}
           onChange={this.onChangePage}
         />
-        {/* <Row type="flex" justify="space-around">
-          <Pagination
-            style={{ margin: "50px 0" }}
-            showQuickJumper
-            defaultCurrent={1}
-            total={500}
-            onChange={this.onChangePage}
-          />
-        </Row> */}
-        
       </>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  data: state.datas.users
-})
+  // FIXME: state.datas.userReducer
+  data: state.userReducers.users
+});
 
-export default connect(mapStateToProps, { getUsers, deleteUser })(Users)
+const mapDispatchToProps = {
+  getUsers,
+  deleteUser
+}
 
-
+// HOCs
+export default connect(
+  mapStateToProps,
+  //{ getUsers, deleteUser }
+  mapDispatchToProps
+)(Users);

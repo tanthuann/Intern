@@ -1,18 +1,44 @@
-import React from 'react';
-import { Menu } from 'antd';
-import { BrowserRouter as  Link } from "react-router-dom";
+import React from "react";
+import { Menu, Icon } from "antd";
+import { BrowserRouter as Router, Link } from "react-router-dom";
 
-export default function(){
-    return(
-        <Menu
-        theme="dark"
-        mode="horizontal"
-        // defaultSelectedKeys={['1']}
-        style={{ lineHeight: '64px' }}
-      >
-        <Menu.Item key="1"><Link to="/">Home</Link></Menu.Item>
-        <Menu.Item key="2"><Link to="/photos">Photos</Link></Menu.Item>
-        <Menu.Item key="3"><Link to="/users">Users</Link></Menu.Item>
-      </Menu>
-    );
+export default function() {
+  const menus = [
+    {
+      key: "home",
+      type: "home",
+      path: "/",
+      name: "Home"
+    },
+    {
+      key: "Album",
+      type: "picture",
+      path: "/photos",
+      name: "Album"
+    },
+    {
+      key: "Users",
+      type: "user",
+      path: "/users",
+      name: "Users"
+    }
+  ];
+
+  return (
+    <Menu
+      theme="dark"
+      mode="horizontal"
+      defaultSelectedKeys={["home"]}
+      style={{ lineHeight: "64px" }}
+      mode="inline"
+    >
+      {menus.map(menu => (
+        <Menu.Item key={menu.key}>
+          <Icon type={menu.type}></Icon>
+          <span>{menu.name}</span>
+          <Link to={menu.path}></Link>
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
 }

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import axios from "axios";
 import { connect } from "react-redux";
-import { getPhotoAlbum } from "../actions/getActions";
+import { getPhotoAlbum } from "../actions/photoActions";
 
 import { Row, Pagination, Spin } from "antd";
 
 //Components
 import CardPhoto from "./CardPhoto.js";
+import Title from "antd/lib/typography/Title";
 
 class Photos extends Component {
   constructor(props) {
@@ -27,11 +27,11 @@ class Photos extends Component {
 
   componentDidMount() {
     this.props.getPhotoAlbum();
-    setInterval( () => {
+    setInterval(() => {
       this.setState({
         loading: false
-      })
-    }, 500)
+      });
+    }, 500);
   }
 
   render() {
@@ -39,8 +39,11 @@ class Photos extends Component {
     const { loading } = this.state;
     return (
       <Spin tip="Loading..." spinning={loading} size="large">
+        <Title style={{ textAlign: "center", marginTop: "20px" }}>
+          Photos Album
+        </Title>
         <Row
-          style={{ margin: "10% 15%" }}
+          style={{ margin: "auto 10%" }}
           gutter={12}
           type="flex"
           justify="space-around"
@@ -62,10 +65,15 @@ class Photos extends Component {
 }
 
 const mapStateToProps = state => ({
-  data: state.datas.album
+  data: state.photoReducers.photos
 });
+
+const mapDispatchToProps = {
+  getPhotoAlbum
+}
 
 export default connect(
   mapStateToProps,
-  { getPhotoAlbum }
+  //{ getPhotoAlbum }
+  mapDispatchToProps
 )(Photos);

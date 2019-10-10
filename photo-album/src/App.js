@@ -1,49 +1,59 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import { Provider } from "react-redux";
-import { Layout } from "antd";
+import { Layout, Icon, BackTop } from "antd";
 
-import store from './store';
+import store from "./store";
 
 //Components
-import TopMenu from "./Components/TopMenu";
+import SiderLayout from "./Layout/SiderLayout";
+import HeaderLayoutIn from "./Layout/HeaderLayoutIn";
+import ContentLayoutIn from "./Layout/ContentLayoutIn";
 
 //CSS
 import "antd/dist/antd.css";
 import "./App.css";
 
-import { routes } from "./routers/routers";
-
 //const {Title, Paragraph } = Typography;
-const { Header, Content } = Layout;
+const { Footer } = Layout;
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: []
+      collapsed: false
     };
   }
+
+  toggle = () => {
+    this.setState({
+      collapsed: !this.state.collapsed
+    });
+  };
 
   render() {
     return (
       <Provider store={store}>
-        <Layout>
+        <Layout style={{ height: "100%" }}>
           <Router>
-            <Header>
-              <TopMenu />
-            </Header>
-            <Switch>
-            {routes.map((route, index) => (
-              <Route
-                key={index}
-                path={route.path}
-                exact={route.exact}
-                component={route.component}
-              ></Route>
-            ))}
-            </Switch>
+            <SiderLayout collapsed={this.state.collapsed} />
+            <Layout style={{ marginLeft: this.state.collapsed ? 80 : 200 }}>
+              <HeaderLayoutIn
+                collapsed={this.state.collapsed}
+                toggle={this.toggle}
+              />
+              <ContentLayoutIn />
+              <Footer style={{ textAlign: "center" }}>
+                Demo ©2018 Created by z01nn
+              </Footer>
+            </Layout>
           </Router>
         </Layout>
+        <BackTop>
+          <div className="ant-back-top-inner">
+            <Icon type="up" />
+          </div>
+        </BackTop>
       </Provider>
     );
   }

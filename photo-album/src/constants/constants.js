@@ -1,4 +1,4 @@
-import ACTIONS from "./actions";
+import { ACTIONS } from "./actions";
 
 export const LIMIT_PHOTOS = 9;
 export const LIMIT_USERS = 10;

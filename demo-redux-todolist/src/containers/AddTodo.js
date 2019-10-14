@@ -5,7 +5,6 @@ import { addTodo } from "../actions/action";
 class AddTodo extends React.Component {
   render() {
     let input;
-    console.log(this.props);
     return (
       <div>
         <form

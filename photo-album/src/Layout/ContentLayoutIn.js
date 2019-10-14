@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Layout} from "antd";
 
 import { routes } from "../routers/routers";
+import BreadcumbCompoent from "../Components/BreadcumbComponent";
 
 const { Content } = Layout;
 class ContentLayoutIn extends Component {
@@ -16,6 +17,16 @@ class ContentLayoutIn extends Component {
           minHeight: 100
         }}
       >
+        <BreadcumbCompoent/>
+        {routes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              exact={route.exact}
+              component={route.main}
+            >
+            </Route>
+          ))}
         <Switch>
           {routes.map((route) => (
             <Route
@@ -23,7 +34,8 @@ class ContentLayoutIn extends Component {
               path={route.path}
               exact={route.exact}
               component={route.component}
-            ></Route>
+            >
+            </Route>
           ))}
         </Switch>
       </Content>

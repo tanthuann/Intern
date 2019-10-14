@@ -1,9 +1,10 @@
 import CONSTANTS from "../constants/constants";
 
 const {
-  AXIOS_GET_ALBUM,
+  AXIOS_UPDATE_USER,
   AXIOS_GET_USERS,
-  AXIOS_DELETE_USER
+  AXIOS_DELETE_USER,
+  AXIOS_POST_USER
 } = CONSTANTS.ACTIONS;
 
 const initialState = {
@@ -18,13 +19,22 @@ export default function(state = initialState, action) {
         ...state,
         users: action.payload
       };
+    case AXIOS_UPDATE_USER:
+      return {
+        ...state,
+        user: action.payload
+      }
     case AXIOS_DELETE_USER:
-      console.log(action.id);
       return {
         ...state,
         users: state.users.filter(user => user.id !== action.id)
       };
-
+    case AXIOS_POST_USER:
+      return {
+        ...state,
+        user: action.payload,
+        users: state.users.concat(action.payload)
+      };
     default:
       return state;
   }

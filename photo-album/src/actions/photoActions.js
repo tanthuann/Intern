@@ -6,11 +6,9 @@ import { CONFIG_CONSTANTS } from "../config";
 const { AXIOS_GET_ALBUM } = CONSTANTS.ACTIONS;
 
 export const getPhotoAlbum = (startPhoto = 0) => dispatch => {
-  console.log(startPhoto, CONSTANTS.LIMIT_PHOTOS);
-
   axios
     .get(
-      `${CONFIG_CONSTANTS.API_URL}/photos?_start=${startPhoto}&_limit=${CONSTANTS.LIMIT_PHOTOS}`
+      `${CONFIG_CONSTANTS.API_URL_PHOTOS}/photos?_start=${startPhoto}&_limit=${CONSTANTS.LIMIT_PHOTOS}`
     )
     .then(res => res.data)
     .then(data =>

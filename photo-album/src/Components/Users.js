@@ -1,17 +1,10 @@
 import React from "react";
 import { connect } from "react-redux";
-import { deleteUser, getUsers } from "../actions/userActions";
+import { deleteUser, getUsers, updateUser } from "../actions/userActions";
+import { BrowserRouter as Router, Link } from "react-router-dom";
 
-import {
-  Table,
-  Typography,
-  Input,
-  Button,
-  Icon,
-  Popconfirm
-} from "antd";
+import { Table, Input, Button, Icon, Popconfirm } from "antd";
 import Highlighter from "react-highlight-words";
-import axios from "axios";
 
 //Contants
 import { LIMIT_USERS } from "../constants/constants";
@@ -19,13 +12,12 @@ import { LIMIT_USERS } from "../constants/constants";
 //Components
 //import CreateUser from './CreateUser';
 
-const { Title } = Typography;
-
 class Users extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchText: ""
+      searchText: "",
+      deleted: false
     };
 
     this.onChangePage = this.onChangePage.bind(this);
@@ -35,7 +27,6 @@ class Users extends React.Component {
     //let startUser;
     let startUser = LIMIT_USERS * (pageNumber.current - 1);
     this.props.getUsers(startUser);
-    console.log("???", pageNumber);
   }
 
   getColumnSearchProps = dataIndex => ({
@@ -110,11 +101,13 @@ class Users extends React.Component {
   };
 
   handleDelete = id => {
-    const data = [...this.props.data];
-    console.log("ham handle :", data);
-    //this.setState({ data: data.filter(item => item.key !== key) });
     this.props.deleteUser(id);
   };
+
+  // handleUpdate = id => {
+  //   const data = this.props.data.filter(user => user.id === id);
+  //   // this.props.updateUser(...data);
+  // };
 
   componentDidMount() {
     this.props.getUsers();
@@ -122,15 +115,7 @@ class Users extends React.Component {
 
   render() {
     const { data } = this.props;
-    console.log(data);
     const columns = [
-      {
-        title: "Id",
-        dataIndex: "id",
-        defaultSortOrder: "ascend",
-        sorter: (a, b) => a.id - b.id,
-        ...this.getColumnSearchProps("id")
-      },
       {
         title: "Name",
         dataIndex: "name",
@@ -141,12 +126,13 @@ class Users extends React.Component {
         ...this.getColumnSearchProps("name")
       },
       {
-        title: "User Name",
-        dataIndex: "username",
-        onFilter: (value, record) => record.name.indexOf(value) === 0,
-        sorter: (a, b) => a.username.length - b.username.length,
+        title: "Gender",
+        dataIndex: "gender",
+        // specify the condition of filtering result
+        // here is that finding the name started with `value`
+        sorter: (a, b) => a.name.length - b.name.length,
         sortDirections: ["descend", "ascend"],
-        ...this.getColumnSearchProps("username")
+        ...this.getColumnSearchProps("gender")
       },
       {
         title: "Email",
@@ -160,22 +146,31 @@ class Users extends React.Component {
         dataIndex: "operation",
         render: (text, record) =>
           this.props.data.length >= 1 ? (
-            <Popconfirm
-              title="Sure to delete?"
-              onConfirm={() => this.handleDelete(record.id)}
-            >
-              <Button type="danger" ghost>
-                Delete
+            <>
+              <Button
+                type="primary"
+                ghost
+                style={{ marginRight: "5px" }}
+              >
+                <Link to={`/users/update/${record.id}`}>Edit</Link>
               </Button>
-            </Popconfirm>
+              <Popconfirm
+                title="Sure to delete?"
+                onConfirm={() => this.handleDelete(record.id)}
+              >
+                <Button type="danger" ghost>
+                  Delete
+                </Button>
+              </Popconfirm>
+            </>
           ) : null
       }
     ];
     return (
       <>
-        <Title style={{ textAlign: "center", marginTop: "20px" }}>
-          Users List
-        </Title>
+        <Button type="primary">
+          <Link to="/users/create">Create</Link>
+        </Button>
         <Table
           columns={columns}
           dataSource={data}
@@ -194,8 +189,9 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   getUsers,
-  deleteUser
-}
+  deleteUser,
+  updateUser
+};
 
 // HOCs
 export default connect(

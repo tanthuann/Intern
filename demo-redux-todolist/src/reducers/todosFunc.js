@@ -5,7 +5,6 @@ const { ADD_TODO, TOGGLE_TODO } = CONTANTS.MODELS.TODO_MODELS;
 export default function todos(state = [], action) {
   switch (action.type) {
     case ADD_TODO:
-      console.log(action.id);
       return [
         ...state,
         {
@@ -16,7 +15,6 @@ export default function todos(state = [], action) {
       ];
     case TOGGLE_TODO:
       return state.map(todo => {
-        console.log(action.id);
         if (todo.id === action.id) {
           return { ...todo, completed: !todo.completed };
         }

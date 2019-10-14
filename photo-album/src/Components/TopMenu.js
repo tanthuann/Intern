@@ -5,30 +5,30 @@ import { BrowserRouter as Router, Link } from "react-router-dom";
 export default function() {
   const menus = [
     {
-      key: "home",
+      key: "/",
       type: "home",
       path: "/",
       name: "Home"
     },
     {
-      key: "Album",
+      key: "photos",
       type: "picture",
       path: "/photos",
       name: "Album"
     },
     {
-      key: "Users",
+      key: "users",
       type: "user",
       path: "/users",
       name: "Users"
     }
   ];
-
+  const path = window.location.pathname.split("/").pop() || "/";
   return (
     <Menu
       theme="dark"
       mode="horizontal"
-      defaultSelectedKeys={["home"]}
+      defaultSelectedKeys={[path]}
       style={{ lineHeight: "64px" }}
       mode="inline"
     >

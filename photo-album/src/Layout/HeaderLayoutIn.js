@@ -1,13 +1,11 @@
 import React, { Component } from "react";
-
 import { Layout, Icon } from "antd";
 
-import '../App.css'
+import "../App.css";
 
 const { Header } = Layout;
 
 export default class HeaderLayoutIn extends Component {
-
   render() {
     return (
       <Header style={{ background: "#fff", padding: "0" }}>

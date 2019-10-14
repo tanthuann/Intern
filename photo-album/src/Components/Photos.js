@@ -6,7 +6,6 @@ import { Row, Pagination, Spin } from "antd";
 
 //Components
 import CardPhoto from "./CardPhoto.js";
-import Title from "antd/lib/typography/Title";
 
 class Photos extends Component {
   constructor(props) {
@@ -39,9 +38,6 @@ class Photos extends Component {
     const { loading } = this.state;
     return (
       <Spin tip="Loading..." spinning={loading} size="large">
-        <Title style={{ textAlign: "center", marginTop: "20px" }}>
-          Photos Album
-        </Title>
         <Row
           style={{ margin: "auto 10%" }}
           gutter={12}
@@ -70,7 +66,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = {
   getPhotoAlbum
-}
+};
 
 export default connect(
   mapStateToProps,

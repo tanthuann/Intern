@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
 
-import { createUser } from "../actions/userActions";
+import { updateUser, getUsers } from "../actions/userActions";
 
 import { Input, Button, Radio } from "antd";
 
@@ -10,9 +10,10 @@ export class CreateUser extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: "",
       name: "",
       email: "",
-      gender: "Male",
+      gender: "",
       redirect: false
     };
   }
@@ -23,18 +24,33 @@ export class CreateUser extends Component {
     });
   };
 
-  onCreateUser = () => {
-    const { name, email, gender } = this.state;
-    this.props.createUser(name, email, gender);
+  onUpdateUser = () => {
+    const { name, email, gender, id } = this.state;
+    this.props.updateUser(id, name, email, gender);
     this.setState({
       redirect: true
     });
   };
+
+  componentDidMount() {
+    const id = window.location.pathname.split("/").pop();
+    const [{ ...data }] = this.props.data.filter(
+      user => user.id === parseInt(id)
+    );
+    this.setState({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      gender: data.gender
+    });
+  }
   render() {
     const { redirect } = this.state;
     if (redirect) {
+        this.props.getUsers();
       return <Redirect to="/users" />;
     }
+
     return (
       <form>
         <label htmlFor="name">Name:</label>
@@ -70,12 +86,12 @@ export class CreateUser extends Component {
         <br />
         <br />
         <Button
-          type="primary"
+          type="danger"
           style={{ backgroundColor: "#95de64" }}
-          onClick={this.onCreateUser}
+          onClick={this.onUpdateUser}
           ghost
         >
-          Create
+          Update
         </Button>
       </form>
     );
@@ -87,7 +103,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  createUser
+  getUsers,
+  updateUser
 };
 
 export default connect(

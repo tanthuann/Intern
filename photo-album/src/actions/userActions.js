@@ -1,32 +1,45 @@
 import CONSTANTS from "../constants/constants";
 import axios from "axios";
+import { errorLoading, startLoading, successLoading } from "./loadingAction";
 
 import { CONFIG_CONSTANTS } from "../config";
 
 const {
-  AXIOS_DELETE_USER,
-  AXIOS_GET_USERS,
-  AXIOS_POST_USER,
-  AXIOS_UPDATE_USER
+  DELETE_USER,
+  GET_USERS,
+  POST_USER,
+  UPDATE_USER
 } = CONSTANTS.ACTIONS;
 
 export const getUsers = (startUser = 0) => dispatch => {
+  startLoading(dispatch);
+  //dispatch({type: LOAD_USERS_LOADING})
   axios
     .get(
       `${CONFIG_CONSTANTS.API_URL_USERS}/users?_start=${startUser}&_limit=${CONSTANTS.LIMIT_USERS}`
       //"https://dcsfq.sse.codesandbox.io/users?_start=1&_limit=20"
     )
     .then(res => res.data)
-    .then(data =>
+    .then(data => {
       dispatch({
-        type: AXIOS_GET_USERS,
+        type: GET_USERS,
         payload: data
-      })
-    )
-    .catch(err => err.response.data);
+      });
+      successLoading(dispatch);
+    })
+    .catch(err => {
+      errorLoading(dispatch, err);
+      return err.response.data;
+    });
 };
 
-export const createUser = (name, email, gender) => dispatch => {
+export const createUser = (
+  name,
+  email,
+  gender,
+  callback = null
+) => dispatch => {
+  startLoading(dispatch);
   axios
     .post(`${CONFIG_CONSTANTS.API_URL_USERS}/users`, {
       name,
@@ -36,14 +49,21 @@ export const createUser = (name, email, gender) => dispatch => {
     .then(res => res.data)
     .then(dataNewUser => {
       dispatch({
-        type: AXIOS_POST_USER,
+        type: POST_USER,
         payload: dataNewUser
       });
+      successLoading(dispatch);
+      // trigger callback
+      if (callback) callback();
     })
-    .catch(err => err.response.data);
+    .catch(err => {
+      errorLoading(dispatch, err);
+      return err.response.data;
+    });
 };
 
-export const updateUser = (id, name, email, gender) =>dispatch => {
+export const updateUser = (id, name, email, gender, callback) => dispatch => {
+  startLoading(dispatch);
   axios
     .put(`${CONFIG_CONSTANTS.API_URL_USERS}/users/${id}`, {
       name,
@@ -53,38 +73,49 @@ export const updateUser = (id, name, email, gender) =>dispatch => {
     .then(res => res.data)
     .then(data => {
       dispatch({
-        type: AXIOS_UPDATE_USER,
+        type: UPDATE_USER,
         payload: { id, name, email, gender }
       });
 
-      //dispatch({ type: AXIOS_GET_USERS, payload: data });
-
-      // axios
-      //   .get(
-      //     `${CONFIG_CONSTANTS.API_URL_USERS}/users?_start=0&_limit=${CONSTANTS.LIMIT_USERS}`
-      //     //"https://dcsfq.sse.codesandbox.io/users?_start=1&_limit=20"
-      //   )
-      //   .then(res => res.data)
-      //   .then(data =>
-      //     dispatch({
-      //       type: AXIOS_GET_USERS,
-      //       payload: data
-      //     })
-      //   )
-      //   .catch(err => err.response.data);
+      // trigger callback
+      successLoading(dispatch);
+      if (callback) callback();
     })
-    .catch(err => err.response.data);
+    .catch(err => {
+      errorLoading(dispatch, err);
+      return err.response.data;
+    });
 };
 
 export const deleteUser = id => dispatch => {
+  startLoading(dispatch);
   axios
     .delete(`${CONFIG_CONSTANTS.API_URL_USERS}/users/${id}`)
     .then(res => res.data)
-    .then(() =>
+    .then(() => {
       dispatch({
-        type: AXIOS_DELETE_USER,
-        id: id
-      })
-    )
-    .catch(err => err.response.data);
+        type: DELETE_USER,
+        payload: id
+      });
+      axios
+        .get(
+          `${CONFIG_CONSTANTS.API_URL_USERS}/users?_start=0&_limit=${CONSTANTS.LIMIT_USERS}`
+          //"https://dcsfq.sse.codesandbox.io/users?_start=1&_limit=20"
+        )
+        .then(res => res.data)
+        .then(data =>{
+
+          dispatch({
+            type: GET_USERS,
+            payload: data
+          })
+          successLoading(dispatch);
+        }
+        )
+        .catch(err => err.response.data);
+    })
+    .catch(err => {
+      errorLoading(dispatch, err);
+      return err.response.data;
+    });
 };

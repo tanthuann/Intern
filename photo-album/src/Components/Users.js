@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { deleteUser, getUsers, updateUser } from "../actions/userActions";
 import { BrowserRouter as Router, Link } from "react-router-dom";
 
-import { Table, Input, Button, Icon, Popconfirm } from "antd";
+import { Table, Input, Button, Icon, Popconfirm, Spin } from "antd";
 import Highlighter from "react-highlight-words";
 
 //Contants
@@ -114,7 +114,7 @@ class Users extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, loading } = this.props;
     const columns = [
       {
         title: "Name",
@@ -148,9 +148,12 @@ class Users extends React.Component {
           this.props.data.length >= 1 ? (
             <>
               <Button
-                type="primary"
                 ghost
-                style={{ marginRight: "5px" }}
+                style={{
+                  marginRight: "5px",
+                  color: "#722ed1",
+                  border: "1px solid #722ed1"
+                }}
               >
                 <Link to={`/users/update/${record.id}`}>Edit</Link>
               </Button>
@@ -168,23 +171,37 @@ class Users extends React.Component {
     ];
     return (
       <>
-        <Button type="primary">
-          <Link to="/users/create">Create</Link>
+        <Button
+          type="primary"
+          style={{ width: "200", height: "40px", marginBottom: "10px" }}
+        >
+          <Link to="/users/create">Create New User</Link>
         </Button>
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={{ pageSize: 10 }}
-          onChange={this.onChangePage}
-        />
+        {/* <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        > */}
+          <Spin tip="Loadingg..." spinning={loading}>
+            <Table
+              columns={columns}
+              dataSource={data}
+              pagination={{ pageSize: 10 }}
+              onChange={this.onChangePage}
+            />
+          </Spin>
+        {/* </div> */}
       </>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  // FIXME: state.datas.userReducer
-  data: state.userReducers.users
+  data: state.userReducers.users,
+  loading: state.loadingReducers.loading,
+  errorLoading: state.loadingReducers.error
 });
 
 const mapDispatchToProps = {

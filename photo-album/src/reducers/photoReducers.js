@@ -1,6 +1,6 @@
 import CONSTANTS from "../constants/constants";
 
-const { AXIOS_GET_ALBUM } = CONSTANTS.ACTIONS;
+const { GET_ALBUM } = CONSTANTS.ACTIONS;
 
 const initialState = {
   photos: []
@@ -8,7 +8,7 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case AXIOS_GET_ALBUM:
+    case GET_ALBUM:
       return {
         ...state,
         photos: action.payload

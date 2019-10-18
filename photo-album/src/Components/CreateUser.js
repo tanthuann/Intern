@@ -4,86 +4,144 @@ import { Redirect } from "react-router-dom";
 
 import { createUser } from "../actions/userActions";
 
-import { Input, Button, Radio } from "antd";
+import { Input, Button, Radio, Form, Alert } from "antd";
 
-export class CreateUser extends Component {
-  constructor(props) {
-    super(props);
+class CreateUser extends Component {
+  constructor() {
+    super();
     this.state = {
-      name: "",
-      email: "",
-      gender: "Male",
       redirect: false
     };
   }
-  handleInputChange = event => {
-    const { value, name } = event.target;
-    this.setState({
-      [name]: value
+  onCreateUser = e => {
+    const callback = () => {
+      this.setState({
+        redirect: true
+      });
+    };
+
+    //this.props.createUser(name, email, gender, callback);
+    e.preventDefault();
+    this.props.form.validateFields((errors, values) => {
+      console.log({ errors, values });
+      if (!errors) {
+        const { name, email, gender } = values;
+        this.props.createUser(name, email, gender, callback);
+        console.log("Create success !!!");
+      }
     });
   };
 
-  onCreateUser = () => {
-    const { name, email, gender } = this.state;
-    this.props.createUser(name, email, gender);
-    this.setState({
-      redirect: true
-    });
-  };
   render() {
+    //const check = this.checkPermissionClick();
     const { redirect } = this.state;
+    const { loading, error } = this.props;
     if (redirect) {
       return <Redirect to="/users" />;
     }
+    const { getFieldDecorator } = this.props.form;
     return (
-      <form>
-        <label htmlFor="name">Name:</label>
-        <br />
-        <Input
-          type="text"
-          id="name"
-          name="name"
-          onChange={this.handleInputChange}
-          value={this.state.name}
-        />
-        <br />
-        <br />
-        <label htmlFor="email">Email:</label>
-        <br />
-        <Input
-          type="email"
-          id="email"
-          name="email"
-          onChange={this.handleInputChange}
-          value={this.state.email}
-        />
-        <br />
-        <br />
-        <Radio.Group
-          onChange={this.handleInputChange}
-          value={this.state.gender}
-          name="gender"
-        >
-          <Radio value={"Male"}>Male</Radio>
-          <Radio value={"Female"}>Female</Radio>
-        </Radio.Group>{" "}
-        <br />
-        <br />
-        <Button
-          type="primary"
-          style={{ backgroundColor: "#95de64" }}
-          onClick={this.onCreateUser}
-          ghost
-        >
-          Create
-        </Button>
-      </form>
+      <>
+        
+        <Form style={{ padding: "0 20%" }} required>
+        {error && (
+          <Alert
+          
+            message="Error"
+            description="Error creating user"
+            type="error"
+            showIcon
+          />
+        )}
+          <Form.Item label="Name">
+            {getFieldDecorator("name", {
+              initialValue: "",
+              rules: [
+                {
+                  min: 8,
+                  message: "Name must 8 character"
+                },
+                {
+                  max: 50,
+                  message: "Name too long"
+                },
+                {
+                  required: true,
+                  message: "Please input your Name"
+                }
+              ]
+            })(
+              <Input
+                type="text"
+                id="name"
+                name="name"
+                //onChange={this.handleInputChange}
+                placeholder={"Your name"}
+              />
+            )}
+          </Form.Item>
+          <Form.Item label="Email">
+            {getFieldDecorator("email", {
+              initialValue: "",
+              rules: [
+                {
+                  type: "email",
+                  message: "The input is not valid E-mail!"
+                },
+                {
+                  required: true,
+                  message: "Please input your E-mail!"
+                }
+              ]
+            })(
+              <Input
+                type="email"
+                id="email"
+                name="email"
+                placeholder={"Your email"}
+                //onChange={this.handleInputChange}
+              />
+            )}
+          </Form.Item>
+          <Form.Item label="Gender">
+            {getFieldDecorator("gender", {
+              // initialValue: "Male",
+              rules: [
+                {
+                  required: true,
+                  message: "Please choose your Gender"
+                }
+              ]
+            })(
+              <Radio.Group>
+                <Radio value={"Male"}>Male</Radio>
+                <Radio value={"Female"}>Female</Radio>
+              </Radio.Group>
+            )}
+          </Form.Item>
+          <Button
+            type="primary"
+            style={{ backgroundColor: "#95de64" }}
+            onClick={e => this.onCreateUser(e)}
+            ghost
+            loading={loading}
+            // FIXME: this.props.form.validateFields
+            //disabled={this.props.form.validateFields((e,v) => e ? true : false)}
+          >
+            Create
+          </Button>
+        </Form>
+      </>
     );
   }
 }
 
+CreateUser = Form.create({})(CreateUser);
+
 const mapStateToProps = state => ({
-  data: state.userReducers.users
+  data: state.userReducers.users,
+  loading: state.loadingReducers.loading,
+  error: state.loadingReducers.error
 });
 
 const mapDispatchToProps = {

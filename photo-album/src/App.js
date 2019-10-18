@@ -34,7 +34,7 @@ class App extends React.Component {
   render() {
     return (
       <Provider store={store}>
-        <Layout style={{ height: "100%" }}>
+        <Layout style={{ minHeight: "100vh" }}>
           <Router>
             <SiderLayout collapsed={this.state.collapsed} />
             <Layout style={{ marginLeft: this.state.collapsed ? 80 : 200 }}>
@@ -43,7 +43,7 @@ class App extends React.Component {
                 toggle={this.toggle}
               />
               <ContentLayoutIn />
-              <Footer style={{ textAlign: "center" }}>
+              <Footer className="" style={{ textAlign: "center", margin: "auto" }}>
                 Demo ©2018 Created by z01nn
               </Footer>
             </Layout>

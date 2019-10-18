@@ -3,7 +3,7 @@ import { Descriptions } from "antd";
 
 export default function() {
   return (
-    <div style={{ border: "1px solid black", margin: "10% auto" }}>
+    <div style={{ border: "1px solid black", margin: "2% auto" }}>
       <Descriptions
         title="User Info"
         layout="vertical"

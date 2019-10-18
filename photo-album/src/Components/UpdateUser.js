@@ -1,14 +1,21 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Redirect } from "react-router-dom";
+import {
+  Redirect,
+  HashRouter as Router,
+  Link,
+  withRouter
+} from "react-router-dom";
 
 import { updateUser, getUsers } from "../actions/userActions";
 
-import { Input, Button, Radio } from "antd";
+import { Input, Button, Radio, Form, Modal, Alert } from "antd";
 
-export class CreateUser extends Component {
-  constructor(props) {
-    super(props);
+//const { confirm } = Modal;
+
+class UpdateUser extends Component {
+  constructor() {
+    super();
     this.state = {
       id: "",
       name: "",
@@ -17,89 +24,170 @@ export class CreateUser extends Component {
       redirect: false
     };
   }
-  handleInputChange = event => {
-    const { value, name } = event.target;
-    this.setState({
-      [name]: value
-    });
-  };
 
-  onUpdateUser = () => {
-    const { name, email, gender, id } = this.state;
-    this.props.updateUser(id, name, email, gender);
-    this.setState({
-      redirect: true
-    });
-  };
-
-  componentDidMount() {
-    const id = window.location.pathname.split("/").pop();
-    const [{ ...data }] = this.props.data.filter(
+  static getDerivedStateFromProps(props, state) {
+    const id = props.match.params.userId;
+    console.log(id);
+    const [{ id: userId, name, email, gender }] = props.data.filter(
       user => user.id === parseInt(id)
     );
-    this.setState({
-      id: data.id,
-      name: data.name,
-      email: data.email,
-      gender: data.gender
-    });
+    return {
+      id: userId,
+      name,
+      email,
+      gender
+    };
   }
+
+  // componentDidMount() {
+  //   const id = this.props.match.params.userId;
+  //   console.log(id);
+  //   const [{ id: userId, name, email, gender }] = this.props.data.filter(
+  //     user => user.id === parseInt(id)
+  //   );
+
+  //   su dung ham static -> thua`
+  //   this.setState({
+  //     id: userId,
+  //     name,
+  //     email,
+  //     gender
+  //   });
+  // }
+
+  onUpdateUser = e => {
+    const { id } = this.state;
+    //this.props.updateUser(id, name, email, gender, callback);
+    const callback = () => {
+      this.setState({
+        redirect: true
+      });
+    };
+    e.preventDefault();
+    this.props.form.validateFields((errors, values) => {
+      console.log({ errors, values });
+      if (!errors) {
+        const { name, email, gender } = values;
+        Modal.confirm({
+          title: "Do you want to update these items?",
+          content: "",
+          okText: "Yes",
+          cancelText: "No",
+          onOk: () => {
+            this.props.updateUser(id, name, email, gender, callback);
+          }
+        });
+        console.log("Update success !!!");
+      }
+    });
+  };
+
   render() {
+    const { getFieldDecorator } = this.props.form;
+    const {loading, error} = this.props;
     const { redirect } = this.state;
     if (redirect) {
-        this.props.getUsers();
       return <Redirect to="/users" />;
     }
-
     return (
-      <form>
-        <label htmlFor="name">Name:</label>
-        <br />
-        <Input
-          type="text"
-          id="name"
-          name="name"
-          onChange={this.handleInputChange}
-          value={this.state.name}
-        />
-        <br />
-        <br />
-        <label htmlFor="email">Email:</label>
-        <br />
-        <Input
-          type="email"
-          id="email"
-          name="email"
-          onChange={this.handleInputChange}
-          value={this.state.email}
-        />
-        <br />
-        <br />
-        <Radio.Group
-          onChange={this.handleInputChange}
-          value={this.state.gender}
-          name="gender"
-        >
-          <Radio value={"Male"}>Male</Radio>
-          <Radio value={"Female"}>Female</Radio>
-        </Radio.Group>{" "}
-        <br />
-        <br />
+      <Form style={{ padding: "0 20%" }}>
+        {error && (
+          <Alert
+            message="Error"
+            description="Error updating user"
+            type="error"
+            showIcon
+            closable
+          />
+        )}
+        <Form.Item label="Name">
+          {getFieldDecorator("name", {
+            initialValue: this.state.name,
+            rules: [
+              {
+                min: 8,
+                message: "Name must 8 character"
+              },
+              {
+                max: 50,
+                message: "Name too long"
+              },
+              {
+                required: true,
+                message: "Please input your Name"
+              }
+            ]
+          })(
+            <Input
+              type="text"
+              id="name"
+              name="name"
+              placeholder={"Your name"}
+            />
+          )}
+        </Form.Item>
+        <Form.Item label="Email">
+          {getFieldDecorator("email", {
+            initialValue: this.state.email,
+            rules: [
+              {
+                type: "email",
+                message: "The input is not valid E-mail!"
+              },
+              {
+                required: true,
+                message: "Please input your E-mail!"
+              }
+            ]
+          })(
+            <Input
+              type="email"
+              id="email"
+              name="email"
+              placeholder={"Your email"}
+              //onChange={this.handleInputChange}
+            />
+          )}
+        </Form.Item>
+        <Form.Item label="Gender">
+          {getFieldDecorator("gender", {
+            initialValue: this.state.gender,
+            rules: [
+              {
+                required: true,
+                message: "Please choose your Gender"
+              }
+            ]
+          })(
+            <Radio.Group>
+              <Radio value={"Male"}>Male</Radio>
+              <Radio value={"Female"}>Female</Radio>
+            </Radio.Group>
+          )}
+        </Form.Item>
         <Button
-          type="danger"
-          style={{ backgroundColor: "#95de64" }}
-          onClick={this.onUpdateUser}
+          style={{
+            backgroundColor: "#95de64",
+            color: "#52c41a",
+            border: "1px solid #52c41a"
+          }}
+          loading={loading}
+          onClick={e => this.onUpdateUser(e)}
           ghost
+          //disabled={check}
         >
           Update
         </Button>
-      </form>
+      </Form>
     );
   }
 }
 
+UpdateUser = Form.create({})(UpdateUser);
+
 const mapStateToProps = state => ({
-  data: state.userReducers.users
+  data: state.userReducers.users,
+  loading: state.loadingReducers.loading
 });
 
 const mapDispatchToProps = {
@@ -110,4 +198,4 @@ const mapDispatchToProps = {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(CreateUser);
+)(withRouter(UpdateUser));

@@ -34,10 +34,9 @@ class Photos extends Component {
   }
 
   render() {
-    let { data } = this.props;
-    const { loading } = this.state;
+    let { data, loading } = this.props;
     return (
-      <Spin tip="Loading..." spinning={loading} size="large">
+      <Spin tip="Loading..." size="large" spinning={loading}>
         <Row
           style={{ margin: "auto 10%" }}
           gutter={12}
@@ -61,7 +60,8 @@ class Photos extends Component {
 }
 
 const mapStateToProps = state => ({
-  data: state.photoReducers.photos
+  data: state.photoReducers.photos,
+  loading: state.loadingReducers.loading
 });
 
 const mapDispatchToProps = {

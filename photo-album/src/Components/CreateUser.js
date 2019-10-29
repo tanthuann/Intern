@@ -46,7 +46,6 @@ class CreateUser extends Component {
         <Form style={{ padding: "0 20%" }} required>
         {error && (
           <Alert
-          
             message="Error"
             description="Error creating user"
             type="error"
@@ -76,6 +75,7 @@ class CreateUser extends Component {
                 id="name"
                 name="name"
                 //onChange={this.handleInputChange}
+                allowClear
                 placeholder={"Your name"}
               />
             )}
@@ -84,6 +84,11 @@ class CreateUser extends Component {
             {getFieldDecorator("email", {
               initialValue: "",
               rules: [
+                
+                {
+                  max: 50,
+                  message: "Gmail too long"
+                },
                 {
                   type: "email",
                   message: "The input is not valid E-mail!"
@@ -99,6 +104,7 @@ class CreateUser extends Component {
                 id="email"
                 name="email"
                 placeholder={"Your email"}
+                allowClear
                 //onChange={this.handleInputChange}
               />
             )}

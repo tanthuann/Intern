@@ -123,6 +123,7 @@ class UpdateUser extends Component {
               id="name"
               name="name"
               placeholder={"Your name"}
+              allowClear
             />
           )}
         </Form.Item>
@@ -130,6 +131,10 @@ class UpdateUser extends Component {
           {getFieldDecorator("email", {
             initialValue: this.state.email,
             rules: [
+              {
+                max: 50,
+                message: "Gmail too long"
+              },
               {
                 type: "email",
                 message: "The input is not valid E-mail!"
@@ -145,6 +150,7 @@ class UpdateUser extends Component {
               id="email"
               name="email"
               placeholder={"Your email"}
+              allowClear
               //onChange={this.handleInputChange}
             />
           )}

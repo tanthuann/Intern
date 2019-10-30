@@ -19,7 +19,10 @@ const {
   DELETE_COMMENT_FAILURE,
   UPDATE_COMMENT,
   UPDATE_COMMENT_SUCCESS,
-  UPDATE_COMMENT_FAILURE
+  UPDATE_COMMENT_FAILURE,
+  REPLY_COMMENT,
+  REPLY_COMMENT_SUCCESS,
+  REPLY_COMMENT_FAILURE
 } = CONTANTS.ACTIONS;
 
 const { API_URL } = CONFIG_CONSTANTS;
@@ -93,8 +96,8 @@ function* workerDeleteComment(action) {
   }
 }
 
-async function updateComment(comment) {
-  let res = await axios.put(`${API_URL}/comments/${comment.id}`, {
+async function patchComment(comment) {
+  let res = await axios.patch(`${API_URL}/comments/${comment.id}`, {
     ...comment
   });
   return res.status;
@@ -102,13 +105,31 @@ async function updateComment(comment) {
 
 function* workerUpdateComment(action) {
   try {
-    yield call(updateComment, action.payload);
+    yield call(patchComment, action.payload);
     yield put({ type: UPDATE_COMMENT_SUCCESS });
     yield put({ type: API_CALL_REQUEST });
     yield call(action.callback);
   } catch (error) {
     yield call(action.callback);
-    yield put({ type: UPDATE_COMMENT_FAILURE, error: `${error.response.status} Try edit comment again` });
+    yield put({
+      type: UPDATE_COMMENT_FAILURE,
+      error: `${error.response.status} Try edit comment again`
+    });
+  }
+}
+
+function* workerReplyComment(action) {
+  try {
+    yield call(patchComment, action.payload);
+    yield put({ type: REPLY_COMMENT_SUCCESS });
+    yield put({ type: API_CALL_REQUEST });
+    yield call(action.callback);
+  } catch (error) {
+    yield call(action.callback);
+    yield put({
+      type: REPLY_COMMENT_FAILURE,
+      error: `${error.response.status} Try comment again`
+    });
   }
 }
 
@@ -118,6 +139,7 @@ export function* watchFetch() {
     takeLatest(API_LOAD_MORE, workerFetchMoreComment),
     takeLatest(POST_COMMENT, workerPostComment),
     takeLatest(DELETE_COMMENT, workerDeleteComment),
-    takeLatest(UPDATE_COMMENT, workerUpdateComment)
+    takeLatest(UPDATE_COMMENT, workerUpdateComment),
+    takeLatest(REPLY_COMMENT, workerReplyComment)
   ]);
 }

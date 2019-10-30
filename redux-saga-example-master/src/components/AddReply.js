@@ -1,20 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-import { Modal, Button, Form, Input } from "antd";
+import { Modal, Form, Input } from "antd";
 
 import CONTANTS from "../contants/contants";
 
-const { UPDATE_COMMENT } = CONTANTS.ACTIONS;
+const { REPLY_COMMENT } = CONTANTS.ACTIONS;
 
-class UpdateComment extends Component {
+class AddReplyComment extends Component {
   state = { visible: false };
-
-  static getDerivedStateFromProps(props, state) {
-    const id = props.id;
-    const [comment] = props.comments.filter(comment => comment.id === id);
-    return comment || {};
-  }
 
   showModal = () => {
     this.setState({
@@ -24,23 +18,28 @@ class UpdateComment extends Component {
 
   handleOk = e => {
     e.preventDefault();
+    const { comment } = this.props;
+
     this.props.form.validateFields((errors, values) => {
-      console.log({ errors, values });
       if (!errors) {
-        const hidenModal = () => {
+        const hiddenModal = () => {
           this.setState({
             visible: false
           });
           this.props.form.resetFields();
         };
-        this.props.updateComment(
-          this.props.id,
-          values.name,
-          values.body,
-          hidenModal
-        );
+        const reply = {
+          id: !comment.replies
+            ? comment.id + 0.1
+            : (comment.replies[0].id + 0.1).toFixed(1),
+          name: values.name,
+          body: values.body
+        };
+        let replies = [];
+        if (comment.replies) replies = [reply, ...comment.replies];
+        else replies = [reply];
+        this.props.replyComment(comment.id, replies, hiddenModal);
       }
-      return 0;
     });
   };
 
@@ -54,26 +53,15 @@ class UpdateComment extends Component {
     const { getFieldDecorator } = this.props.form;
     return (
       <div>
-        <Button
-          style={{
-            backgroundColor: "#52c41a",
-            border: "none",
-            marginLeft: "5px",
-            color: "white",
-            width: "auto"
-          }}
-          onClick={this.showModal}
-        >
-          Edit
-        </Button>
+        <a style={{ color: "rgba(0, 0, 0, 0.45)" }} onClick={this.showModal}>
+          Reply to
+        </a>
         <Modal
-          title="Update Comment"
+          title="Add Comment"
           visible={this.state.visible}
           onOk={e => this.handleOk(e)}
-          okText={"Update"}
-          okType={"danger"}
           onCancel={this.handleCancel}
-          okButtonProps={{ loading: this.props.loading }}
+          okButtonProps={{ loading: this.props.loadingButton }}
         >
           <Form>
             <Form.Item label="Name">
@@ -90,9 +78,8 @@ class UpdateComment extends Component {
                     message: "Name too long"
                   },
                   {
-                    
                     required: true,
-                    message: ". Please input your Name and don't accept spaces"
+                    message: "Please input your Name and don't accept spaces"
                   }
                 ]
               })(
@@ -112,8 +99,8 @@ class UpdateComment extends Component {
                 initialValue: this.state.body,
                 rules: [
                   {
-                    whitespace: true,
                     required: true,
+                    whitespace: true,
                     message: "Please input your comment and don't accept spaces"
                   }
                 ]
@@ -134,22 +121,18 @@ class UpdateComment extends Component {
   }
 }
 
-UpdateComment = Form.create({})(UpdateComment);
+AddReplyComment = Form.create({})(AddReplyComment);
 
-const mapStateToProps = state => {
-  const { comments, loadingButton} = state.commentReducers
-  return {
-    comments: comments,
-    loading: loadingButton
-  };
-};
+const mapStateToProps = state => ({
+  loadingButton: state.commentReducers.loadingButton
+});
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateComment: (id, name, body, hidenModal) =>
+    replyComment: (id, replies, hidenModal) =>
       dispatch({
-        type: UPDATE_COMMENT,
-        payload: { id, name, body },
+        type: REPLY_COMMENT,
+        payload: { id, replies },
         callback: hidenModal
       })
   };
@@ -158,4 +141,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(UpdateComment);
+)(AddReplyComment);

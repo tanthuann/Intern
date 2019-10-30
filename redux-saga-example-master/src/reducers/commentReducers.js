@@ -15,7 +15,10 @@ const {
   DELETE_COMMENT_SUCCESS,
   UPDATE_COMMENT,
   UPDATE_COMMENT_FAILURE,
-  UPDATE_COMMENT_SUCCESS
+  UPDATE_COMMENT_SUCCESS,
+  REPLY_COMMENT,
+  REPLY_COMMENT_FAILURE,
+  REPLY_COMMENT_SUCCESS
 } = CONTANTS.ACTIONS;
 
 // reducer with initial state
@@ -76,6 +79,13 @@ export default function(state = initialState, action) {
     case UPDATE_COMMENT_SUCCESS:
       return { ...state, loadingButton: false };
     case UPDATE_COMMENT_FAILURE:
+      return { ...state, loadingButton: false, error: action.error };
+
+    case REPLY_COMMENT:
+      return { ...state, loadingButton: true, comment: action.payload };
+    case REPLY_COMMENT_SUCCESS:
+      return { ...state, loadingButton: false };
+    case REPLY_COMMENT_FAILURE:
       return { ...state, loadingButton: false, error: action.error };
     default:
       return state;

@@ -40,9 +40,16 @@ export class ListComments extends Component {
         )}
         <AddComment />
         {comments &&
-          comments.map((comment, index) => (
-            <OneComment key={index} comment={comment} />
-          ))}
+          comments.map((comment, index) => {
+            return (
+              <OneComment key={index} comment={comment}>
+                {comment.replies &&
+                  comment.replies.map((reply, index) => (
+                    <OneComment key={index} comment={reply} reply={true} />
+                  ))}
+              </OneComment>
+            );
+          })}
         {!comments && <h1>Nothing here</h1>}
         <div
           style={{

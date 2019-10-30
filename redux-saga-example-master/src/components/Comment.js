@@ -1,11 +1,22 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Comment, Icon, Tooltip, Avatar, Button, Popconfirm, message  } from "antd";
+import {
+  Comment,
+  Icon,
+  Tooltip,
+  Avatar,
+  Button,
+  Dropdown,
+  Menu,
+  Modal,
+  notification
+} from "antd";
 import moment from "moment";
 
 import CONTANTS from "../contants/contants";
 
 import UpdateComment from "./UpdateComment";
+import AddReply from "./AddReply";
 
 const { DELETE_COMMENT } = CONTANTS.ACTIONS;
 
@@ -16,12 +27,31 @@ class OneComment extends Component {
     action: null
   };
 
-  onConfirm = (id) => {
-    const trigger = () => {
-      message.success('Deleted !!!');
-    }
-    this.props.deleteComment(id, trigger);
-  }
+  showDeleteConfirm = id => {
+    const { deleteComment } = this.props;
+    Modal.confirm({
+      centered: true,
+      title: "Are you sure delete this comment?",
+      content: "",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        const triggerNotify = () => {
+          notification["warning"]({
+            message: `You deleted comment have id: ${id}`,
+            description: "",
+            //Set time (number)
+            duration: 3
+          });
+        };
+        deleteComment(id, triggerNotify);
+      },
+      onCancel() {
+        console.log("Cancel");
+      }
+    });
+  };
 
   like = () => {
     this.setState({
@@ -42,7 +72,21 @@ class OneComment extends Component {
   render() {
     const { comment } = this.props;
     const { likes, dislikes, action } = this.state;
-
+    const menu = (
+      <Menu>
+        <Menu.Item key="1">
+          <Button
+            onClick={() => this.showDeleteConfirm(comment.id)}
+            type="danger"
+          >
+            Delete
+          </Button>
+        </Menu.Item>
+        <Menu.Item key="2">
+          <UpdateComment id={comment.id} />
+        </Menu.Item>
+      </Menu>
+    );
     const actions = [
       <span key="comment-basic-like">
         <Tooltip title="Like">
@@ -64,7 +108,8 @@ class OneComment extends Component {
         </Tooltip>
         <span style={{ paddingLeft: 8, cursor: "auto" }}>{dislikes}</span>
       </span>,
-      <span key="comment-basic-reply-to">Reply to</span>
+      //<span style={{display: this.props.reply ? "none": ""}} key="comment-basic-reply-to"><AddReply/></span>
+      !this.props.reply && <AddReply comment={comment} />
     ];
     return (
       <div>
@@ -88,24 +133,33 @@ class OneComment extends Component {
                 <span>{moment().fromNow()}</span>
               </Tooltip>
             }
-          />
-          <div style={{ display: "flex", marginLeft: "auto" }}>
-            <Popconfirm
-              title="Are you sure？"
-              icon={<Icon type="question-circle-o" style={{ color: "red" }} />}
-              onConfirm={() => this.onConfirm(comment.id)}
-            >
-              <Button
-              // onClick={() => this.props.deleteComment(comment.id)}
-              style={{ backgroundColor: "#ff7875", border: "none" }}
-            >
-              Delete
-            </Button>
-            </Popconfirm>
-            <UpdateComment id={comment.id} />
+          >
+            {this.props.children}
+          </Comment>
+          <div
+            style={{
+              display: this.props.reply ? "none" : "flex",
+              marginLeft: "auto"
+            }}
+          >
+            {!this.props.reply && (
+              <Dropdown overlay={menu}>
+                <a className="ant-dropdown-link" style={{ height: "20px" }}>
+                  <Icon style={{ fontSize: "20px" }} type="more" />
+                </a>
+              </Dropdown>
+            )}
           </div>
         </div>
-        <hr style={{ border: "0.5px solid #ddd" }} />
+
+        {!this.props.reply && (
+          <hr
+            style={{
+              display: this.props.reply ? "none" : "",
+              border: "0.5px solid #ddd"
+            }}
+          />
+        )}
       </div>
     );
   }
@@ -117,7 +171,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    deleteComment: (id, trigger) => dispatch({ type: DELETE_COMMENT, payload: id, callback: trigger })
+    deleteComment: (id, triggerNotify) =>
+      dispatch({ type: DELETE_COMMENT, payload: id, callback: triggerNotify })
   };
 };
 

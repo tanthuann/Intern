@@ -6,12 +6,12 @@ const {
   LOAD_USERS_SUCCESS
 } = CONSTANTS.ACTIONS;
 
-export const startLoading = (dispatch) =>
+export const startLoading = (dispatch, LOADING_ACTION) =>
   dispatch({
     type: LOAD_USERS_LOADING
   });
 
-export const successLoading = dispatch =>
+export const successLoading = (dispatch, SUCCESS_ACTION) =>
   dispatch({
     type: LOAD_USERS_SUCCESS
   });

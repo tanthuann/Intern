@@ -44,7 +44,7 @@ class App extends React.Component {
               />
               <ContentLayoutIn />
               <Footer className="" style={{ textAlign: "center", margin: "auto" }}>
-                Demo ©2018 Created by z01nn
+                Demo ©2019 Created by z01nn
               </Footer>
             </Layout>
           </Router>

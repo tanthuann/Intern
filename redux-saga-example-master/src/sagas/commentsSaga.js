@@ -34,9 +34,25 @@ async function fetchComment(page = 1) {
   return res;
 }
 
+async function postComment(data) {
+  let res = await axios.post(`${API_URL}/comments`, data);
+  return res;
+}
+
+async function patchComment(comment) {
+  let res = await axios.patch(`${API_URL}/comments/${comment.id}`, {
+    ...comment
+  });
+  return res.status;
+}
+
+async function deleteComment(id) {
+  let res = await axios.delete(`${API_URL}/comments/${id}`);
+  return res.status;
+}
+
 function* workerFetchMoreComment(action) {
   try {
-    // rootPage++;
     const responseMore = yield call(fetchComment, action.page);
     const dataMore = responseMore.data;
     yield put({ type: API_LOAD_MORE_SUCCESS, payload: dataMore });
@@ -55,13 +71,8 @@ function* workerFetchComment() {
     yield put({ type: API_CALL_SUCCESS, payload: data, limit });
   } catch (error) {
     // dispatch
-    yield put({ type: API_CALL_FAILURE, error: error.message });
+    yield put({ type: API_CALL_FAILURE, error: `Can't get API` });
   }
-}
-
-async function postComment(data) {
-  let res = await axios.post(`${API_URL}/comments`, data);
-  return res;
 }
 
 function* workerPostComment(action) {
@@ -69,6 +80,7 @@ function* workerPostComment(action) {
     yield call(postComment, action.payload);
     yield put({ type: POST_COMMENT_SUCCESS });
     yield put({ type: API_CALL_REQUEST });
+    //call hidden visible
     yield call(action.callback);
   } catch (error) {
     console.log(error);
@@ -80,27 +92,16 @@ function* workerPostComment(action) {
   }
 }
 
-async function deleteComment(id) {
-  let res = await axios.delete(`${API_URL}/comments/${id}`);
-  return res.status;
-}
-
 function* workerDeleteComment(action) {
   try {
     yield call(deleteComment, action.payload);
     yield put({ type: DELETE_COMMENT_SUCCESS });
     yield put({ type: API_CALL_REQUEST });
+    //call hidden visible
     yield call(action.callback);
   } catch (error) {
     yield put({ type: DELETE_COMMENT_FAILURE, error: error.message });
   }
-}
-
-async function patchComment(comment) {
-  let res = await axios.patch(`${API_URL}/comments/${comment.id}`, {
-    ...comment
-  });
-  return res.status;
 }
 
 function* workerUpdateComment(action) {
@@ -108,6 +109,7 @@ function* workerUpdateComment(action) {
     yield call(patchComment, action.payload);
     yield put({ type: UPDATE_COMMENT_SUCCESS });
     yield put({ type: API_CALL_REQUEST });
+    //call hidden visible
     yield call(action.callback);
   } catch (error) {
     yield call(action.callback);
@@ -123,6 +125,7 @@ function* workerReplyComment(action) {
     yield call(patchComment, action.payload);
     yield put({ type: REPLY_COMMENT_SUCCESS });
     yield put({ type: API_CALL_REQUEST });
+    //call hidden visible
     yield call(action.callback);
   } catch (error) {
     yield call(action.callback);

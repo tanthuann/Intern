@@ -7,8 +7,6 @@ import rootReducers from "./reducers/reducers";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware, compose } from "redux";
 import createSagaMiddleware from "redux-saga";
-// import { watchAgeUp } from "./sagas/ageSaga";
-// import  { watcherSaga} from "./sagas/commentsSaga"
 
 import rootSaga from "./sagas/saga";
 
@@ -24,7 +22,7 @@ const store = createStore(
 sagaMiddleware.run(rootSaga);
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    < App />
   </Provider>,
   document.getElementById("root")
 );
